@@ -102,7 +102,7 @@ jobs:
     - name: Describe ECS service
       id: describe-services
       run: |
-        echo "::set-output name=active::$(aws ecs describe-services --cluster superset-ci --services pr-${{ github.event.issue.number }}-service | jq '.services[] | select(.status == "ACTIVE") | any)"
+        echo "::set-output name=active::$(aws ecs describe-services --cluster superset-ci --services pr-${{ github.event.issue.number }}-service | jq '.services[] | select(.status == "ACTIVE") | any')"
 
     - name: Create ECS service
       if: steps.describe-services.outputs.active != 'true'
