@@ -64,6 +64,15 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    - name: Check if image exists in ECR
+      id: check-image
+      continue-on-error: true
+      run: |
+        echo "::set-output name=metadata::$(aws ecr describe-images \
+        --registry-id $(echo "${{ steps.login-ecr.outputs.registry }}" | grep -Eo "^[0-9]+") \
+        --repository-name superset-ci \
+        --image-ids imageTag=pr-${{ steps.get-pr.outputs.num }})
+
     - name: Load, tag and push image to ECR
       id: push-image
       env:
@@ -76,3 +85,17 @@ jobs:
         docker tag $SHA $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker tag $SHA $ECR_REGISTRY/$ECR_REPOSITORY:$SHA
         docker push -a $ECR_REGISTRY/$ECR_REPOSITORY
+
+    - name: Parse previous image metadata
+      if: steps.check-image.outcome == 'success'
+      id: eval-previous-image
+      run: |
+        echo "::set-output name=image-digest::$(echo '${{ steps.check-image.outputs.metadata }}' | jq -r '.imageDetails | first | .imageDigest')"
+
+    - name: Remove previous image
+      if: steps.eval-previous-image.outcome == 'success'
+      run: |
+        aws ecr batch-delete-image \
+        --registry-id $(echo "${{ steps.login-ecr.outputs.registry }}" | grep -Eo "^[0-9]+") \
+        --repository-name superset-ci \
+        --image-ids imageDigest=${{ steps.eval-previous-image.outputs.image-digest }}
