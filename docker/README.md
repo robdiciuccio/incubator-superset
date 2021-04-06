@@ -37,6 +37,9 @@ intended for use with local development.
 In order to override configuration settings locally, simply make a copy of [./docker/pythonpath_dev/superset_config_local.example](./docker/pythonpath_dev/superset_config_local.example)
 into [./docker/pythonpath_dev/superset_config_docker.py](./docker/pythonpath_dev/superset_config_docker.py) (git ignored) and fill in your overrides.
 
+Feature flags may also be set via environment variables with a `SUPERSET_FEATURE_` prefix. For example: `SUPERSET_FEATURE_THUMBNAILS=true`.
+Overrides set in superset_config_docker.py are evaluated last, and therefore have precedence.
+
 ### Local packages
 
 If you want to add python packages in order to test things like DBs locally, you can simply add a local requirements.txt (./docker/requirements-local.txt)
