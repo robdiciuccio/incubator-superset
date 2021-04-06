@@ -23,6 +23,8 @@
 
 import logging
 import os
+import re
+from distutils.util import strtobool
 
 from cachelib.file import FileSystemCache
 
@@ -66,6 +68,13 @@ REDIS_CELERY_DB = get_env_variable("REDIS_CELERY_DB", 0)
 REDIS_RESULTS_DB = get_env_variable("REDIS_RESULTS_DB", 1)
 
 RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
+
+# use 'SUPERSET_FEATURE_' prefixed environment vars
+FEATURE_FLAGS = {
+    k[len("SUPERSET_FEATURE_") :]: bool(strtobool(v))
+    for k, v in os.environ.items()
+    if re.search("^SUPERSET_FEATURE_\w+", k)
+}
 
 
 class CeleryConfig(object):
