@@ -130,8 +130,8 @@ jobs:
       if: steps.describe-services.outputs.active != 'true'
       id: create-service
       env:
-        ECR_SUBNETS: subnet-0e15a5034b4121710,subnet-0e8efef4a72224974
-        ECR_SECURITY_GROUP: sg-092ff3a6ae0574d91
+        ECR_SUBNETS: subnet-0cec662b80ac3fb67
+        ECR_SECURITY_GROUP: sg-07674b1e6e4a8d78c
       run: |
         aws ecs create-service \
         --cluster superset-ci \
